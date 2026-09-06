@@ -75,6 +75,7 @@ pnpm-debug.log*
 .idea/
 .DS_Store
 Thumbs.db
+.vs/
 
 # Vite / build cache
 .vite/
