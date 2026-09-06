@@ -1,0 +1,11 @@
+{
+  "ConnectionStrings": {
+    "Default": "Host=localhost;Port=5433;Database=whatsathome;Username=whatsathome;Password=devpassword"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}

@@ -6,6 +6,5 @@ namespace Domain
     public class HouseholdItems : BaseItem
     {
         public HouseholdArea Area { get; set; }
-
     }
 }

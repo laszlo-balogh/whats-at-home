@@ -3,18 +3,19 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Common
 {
-    public class BaseItem
+    public abstract class BaseItem
     {
         [Key]
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public required string Name { get; set; }
         public int Quantity { get; set; }
         public required string GroupId { get; set; }
+        public string? AddedByUserId { get; set; }
 
         [ForeignKey("GroupId")]
         public virtual required StorageGroup Group { get; set; }
 
         [ForeignKey("AddedByUserId")]
-        public virtual required AppUser AddedByUser { get; set; }
+        public virtual AppUser? AddedByUser { get; set; }
     }
 }
