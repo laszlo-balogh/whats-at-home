@@ -28,6 +28,8 @@ project.lock.json
 project.fragment.lock.json
 artifacts/
 
+.claude/
+
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 
@@ -94,3 +96,6 @@ appsettings.Development.json
 appsettings.Production.json
 appsettings.Local.json
 appsettings.*.Local.json
+
+# Personal
+notes/

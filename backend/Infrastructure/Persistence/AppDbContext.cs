@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Infrastructure.Identity;
 using Domain.Common;
+using Application.Common.Interfaces;
 
 namespace Infrastructure.Persistence
 {
-    public class AppDbContext(DbContextOptions options) : IdentityDbContext<ApplicationUser>(options)
+    public class AppDbContext(DbContextOptions options) : IdentityDbContext<ApplicationUser>(options), IAppDbContext
     {
         public DbSet<AppUser> AppUsers { get; set; }
         public DbSet<FoodItem> FoodItems { get; set; }
