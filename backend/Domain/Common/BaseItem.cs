@@ -9,13 +9,10 @@ namespace Domain.Common
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public required string Name { get; set; }
         public int Quantity { get; set; }
-        public required string GroupId { get; set; }
-        public string? AddedByUserId { get; set; }
+        public required string StorageId { get; set; }        
 
-        [ForeignKey("GroupId")]
-        public virtual required StorageGroup Group { get; set; }
+        [ForeignKey("StorageId")]
+        public virtual required Storage Storage { get; set; }
 
-        [ForeignKey("AddedByUserId")]
-        public virtual AppUser? AddedByUser { get; set; }
     }
 }

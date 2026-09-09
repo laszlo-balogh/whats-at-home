@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260908222334_MakeUserGroupOptional")]
+    partial class MakeUserGroupOptional
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,60 +49,12 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("StorageId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StorageId");
-
-                    b.ToTable((string)null);
-
-                    b.UseTpcMappingStrategy();
-                });
-
-            modelBuilder.Entity("Domain.ShoppingList", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("AppUserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("GroupId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppUserId");
-
-                    b.HasIndex("GroupId");
-
-                    b.ToTable("ShoppingLists");
-                });
-
-            modelBuilder.Entity("Domain.ShoppingListItem", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
                     b.Property<string>("AddedByUserId")
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsPurchased")
-                        .HasColumnType("boolean");
+                    b.Property<string>("GroupId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -107,44 +62,14 @@ namespace Infrastructure.Migrations
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
-
-                    b.Property<string>("ShoppingListId")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AddedByUserId");
 
-                    b.HasIndex("ShoppingListId");
+                    b.ToTable((string)null);
 
-                    b.ToTable("ShoppingListItems", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Storage", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("AppUserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("GroupId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppUserId")
-                        .IsUnique();
-
-                    b.HasIndex("GroupId")
-                        .IsUnique();
-
-                    b.ToTable("Storages");
+                    b.UseTpcMappingStrategy();
                 });
 
             modelBuilder.Entity("Domain.StorageGroup", b =>
@@ -162,8 +87,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AdminUserId")
-                        .IsUnique();
+                    b.HasIndex("AdminUserId");
 
                     b.ToTable("StorageGroups");
                 });
@@ -377,6 +301,8 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Unit")
                         .HasColumnType("text");
 
+                    b.HasIndex("GroupId");
+
                     b.ToTable("FoodItems", (string)null);
                 });
 
@@ -387,7 +313,21 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Area")
                         .HasColumnType("integer");
 
+                    b.HasIndex("GroupId");
+
                     b.ToTable("HouseholdItems", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.ShoppingListItem", b =>
+                {
+                    b.HasBaseType("Domain.Common.BaseItem");
+
+                    b.Property<bool>("IsPurchased")
+                        .HasColumnType("boolean");
+
+                    b.HasIndex("GroupId");
+
+                    b.ToTable("ShoppingListItems", (string)null);
                 });
 
             modelBuilder.Entity("Domain.AppUser", b =>
@@ -402,75 +342,21 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Common.BaseItem", b =>
                 {
-                    b.HasOne("Domain.Storage", "Storage")
-                        .WithMany("Items")
-                        .HasForeignKey("StorageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Storage");
-                });
-
-            modelBuilder.Entity("Domain.ShoppingList", b =>
-                {
-                    b.HasOne("Domain.AppUser", "AppUser")
-                        .WithMany("ShoppingList")
-                        .HasForeignKey("AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Domain.StorageGroup", "Group")
-                        .WithMany("ShoppingList")
-                        .HasForeignKey("GroupId");
-
-                    b.Navigation("AppUser");
-
-                    b.Navigation("Group");
-                });
-
-            modelBuilder.Entity("Domain.ShoppingListItem", b =>
-                {
                     b.HasOne("Domain.AppUser", "AddedByUser")
                         .WithMany()
                         .HasForeignKey("AddedByUserId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Domain.ShoppingList", "ShoppingList")
-                        .WithMany("ShoppingListItems")
-                        .HasForeignKey("ShoppingListId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("AddedByUser");
-
-                    b.Navigation("ShoppingList");
-                });
-
-            modelBuilder.Entity("Domain.Storage", b =>
-                {
-                    b.HasOne("Domain.AppUser", "AppUser")
-                        .WithOne("Storage")
-                        .HasForeignKey("Domain.Storage", "AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Domain.StorageGroup", "Group")
-                        .WithOne("Storage")
-                        .HasForeignKey("Domain.Storage", "GroupId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("AppUser");
-
-                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("Domain.StorageGroup", b =>
                 {
-                    b.HasOne("Domain.AppUser", "AdminUser")
-                        .WithOne()
-                        .HasForeignKey("Domain.StorageGroup", "AdminUserId")
+                    b.HasOne("Domain.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("AdminUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("AdminUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -524,32 +410,46 @@ namespace Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Domain.AppUser", b =>
+            modelBuilder.Entity("Domain.FoodItem", b =>
                 {
-                    b.Navigation("ShoppingList");
-
-                    b.Navigation("Storage")
+                    b.HasOne("Domain.StorageGroup", "Group")
+                        .WithMany("FoodItems")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Group");
                 });
 
-            modelBuilder.Entity("Domain.ShoppingList", b =>
+            modelBuilder.Entity("Domain.HouseholdItems", b =>
                 {
-                    b.Navigation("ShoppingListItems");
+                    b.HasOne("Domain.StorageGroup", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
                 });
 
-            modelBuilder.Entity("Domain.Storage", b =>
+            modelBuilder.Entity("Domain.ShoppingListItem", b =>
                 {
-                    b.Navigation("Items");
+                    b.HasOne("Domain.StorageGroup", "Group")
+                        .WithMany("ShoppingListItems")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("Domain.StorageGroup", b =>
                 {
+                    b.Navigation("FoodItems");
+
                     b.Navigation("Members");
 
-                    b.Navigation("ShoppingList");
-
-                    b.Navigation("Storage")
-                        .IsRequired();
+                    b.Navigation("ShoppingListItems");
                 });
 #pragma warning restore 612, 618
         }
