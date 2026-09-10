@@ -1,4 +1,6 @@
 using Application.Common.Interfaces;
+using Application.Registration;
+using FluentValidation;
 using Infrastructure.Identity;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
@@ -16,13 +18,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
-builder.Services.AddScoped<IIdentityService, IdentityService>();
-
+builder.Services.AddScoped<IIdentityService, IdentityService>
+    ();
+builder.Services.AddScoped<RegisterUserService>();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.User.RequireUniqueEmail = true;
 })
 .AddEntityFrameworkStores<AppDbContext>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterUserValidator>();
 
 var app = builder.Build();
 

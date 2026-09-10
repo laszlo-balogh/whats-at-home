@@ -1,6 +1,7 @@
 using Application.Common.Interfaces;
 using Application.Common.Models;
 using Domain;
+using FluentValidation;
 
 namespace Application.Registration
 {
@@ -8,16 +9,25 @@ namespace Application.Registration
     {
         private readonly IIdentityService _identityService;
         private readonly IAppDbContext _appDbContext;
+        private readonly IValidator<RegisterUserRequest> _validator;
 
-        public RegisterUserService(IIdentityService identityService, IAppDbContext appDbContext)
+        public RegisterUserService(IIdentityService identityService, IAppDbContext appDbContext, IValidator<RegisterUserRequest> validator)
         {
             _identityService = identityService;
             _appDbContext = appDbContext;
+            _validator = validator;
         }
 
-        public async Task<Result> RegisterUserAsync(RegisterUserRequest request)
+        public async Task<Result> RegisterUserAsync(RegisterUserRequest request, CancellationToken cancellationToken = default)
         {
-            await using var transaction = await _appDbContext.BeginTransactionAsync();
+            var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+
+            if (!validationResult.IsValid)
+            {
+                return Result.Failure(validationResult.Errors.Select(e => e.ErrorMessage));
+            }
+
+            await using var transaction = await _appDbContext.BeginTransactionAsync(cancellationToken);
 
             var (result, userId) = await _identityService.CreateUserAsync(request.Email, request.Password);
 
@@ -42,8 +52,8 @@ namespace Application.Registration
             _appDbContext.Storages.Add(storage);
             _appDbContext.AppUsers.Add(newUser);
             
-            await _appDbContext.SaveChangesAsync();
-            await transaction.CommitAsync();
+            await _appDbContext.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
 
             return Result.Success();
         }
