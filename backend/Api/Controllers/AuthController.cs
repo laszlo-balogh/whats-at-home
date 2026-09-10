@@ -1,4 +1,5 @@
 ﻿using Application.Registration;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
@@ -15,16 +16,20 @@ namespace Api.Controllers
         }
 
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<IActionResult> Register(RegisterUserRequest request, CancellationToken cancellationToken)
         {
             var result = await _registerUserService.RegisterUserAsync(request, cancellationToken);
 
-            if (!result.IsSuccess)
-            {
-                return BadRequest(result.Errors);
-            }
+            if (result.IsSuccess) return Ok();
 
-            return Ok();
+            foreach(var error in result.Errors)
+            {
+                ModelState.AddModelError(error.Item1, error.Item2);
+            }
+            
+
+            return ValidationProblem();
         }
     }
 }

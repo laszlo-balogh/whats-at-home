@@ -24,9 +24,15 @@ namespace Infrastructure.Identity
             }
             else
             {
-                var errors = result.Errors.Select(e => e.Description);
+                var errors = result.Errors.Select(e => (MapErrorCodeToField(e.Code), e.Description));
                 return (Result.Failure(errors), string.Empty);
             }
         }
+        private static string MapErrorCodeToField(string code) => code switch
+        {
+            _ when code.StartsWith("Password") => "Password",
+            _ when code.Contains("UserName") || code.Contains("Email") => "Email",
+            _ => string.Empty
+        };
     }
 }
