@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Infrastructure.Identity;
 using Domain.Common;
 using Application.Common.Interfaces;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Infrastructure.Persistence
 {
@@ -16,6 +17,11 @@ namespace Infrastructure.Persistence
         public DbSet<StorageGroup> StorageGroups { get; set; }
         public DbSet<Storage> Storages { get; set; }
         public DbSet<ShoppingList> ShoppingLists { get; set; }
+
+        public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            return this.Database.BeginTransactionAsync(cancellationToken);
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

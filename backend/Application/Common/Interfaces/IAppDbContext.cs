@@ -1,5 +1,6 @@
 using Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 namespace Application.Common.Interfaces
 {
     public interface IAppDbContext
@@ -13,5 +14,6 @@ namespace Application.Common.Interfaces
         DbSet<ShoppingList> ShoppingLists { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+        Task<IDbContextTransaction >BeginTransactionAsync(CancellationToken cancellationToken = default);
     }
 }
