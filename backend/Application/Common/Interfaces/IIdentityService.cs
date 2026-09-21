@@ -5,5 +5,6 @@ namespace Application.Common.Interfaces
     public interface IIdentityService
     {
         Task<(Result Result, string UserId)> CreateUserAsync(string email, string password);
+        Task<(Result Result, string UserId)> ValidateCredentialsAsync(string email, string password);
     }
 }

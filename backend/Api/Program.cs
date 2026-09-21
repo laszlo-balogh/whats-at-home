@@ -32,8 +32,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
 builder.Services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
-builder.Services.AddScoped<IIdentityService, IdentityService>
-    ();
+builder.Services.AddScoped<IIdentityService, IdentityService>();
+builder.Services.AddScoped<ITokenService, JwtTokenService>();
 builder.Services.AddScoped<RegisterUserService>();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {

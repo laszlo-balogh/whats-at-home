@@ -34,5 +34,16 @@ namespace Infrastructure.Identity
             _ when code.Contains("UserName") || code.Contains("Email") => "Email",
             _ => string.Empty
         };
+
+        public async Task<(Result Result, string UserId)> ValidateCredentialsAsync(string email, string password)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return (Result.Failure(new[] { ("Credentials", "Invalid email or password.") }), string.Empty);
+
+            var isMatch = await _userManager.CheckPasswordAsync(user, password);
+            if (!isMatch) return (Result.Failure(new[] { ("Credentials", "Invalid email or password.") }), string.Empty);
+
+            return (Result.Success(), user.Id);
+        }
     }
 }
