@@ -24,9 +24,26 @@ namespace Infrastructure.Identity
             }
             else
             {
-                var errors = result.Errors.Select(e => e.Description);
+                var errors = result.Errors.Select(e => (MapErrorCodeToField(e.Code), e.Description));
                 return (Result.Failure(errors), string.Empty);
             }
+        }
+        private static string MapErrorCodeToField(string code) => code switch
+        {
+            _ when code.StartsWith("Password") => "Password",
+            _ when code.Contains("UserName") || code.Contains("Email") => "Email",
+            _ => string.Empty
+        };
+
+        public async Task<(Result Result, string UserId)> ValidateCredentialsAsync(string email, string password)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return (Result.Failure(new[] { ("Credentials", "Invalid email or password.") }), string.Empty);
+
+            var isMatch = await _userManager.CheckPasswordAsync(user, password);
+            if (!isMatch) return (Result.Failure(new[] { ("Credentials", "Invalid email or password.") }), string.Empty);
+
+            return (Result.Success(), user.Id);
         }
     }
 }

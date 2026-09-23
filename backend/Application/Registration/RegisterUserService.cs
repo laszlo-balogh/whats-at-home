@@ -24,7 +24,7 @@ namespace Application.Registration
 
             if (!validationResult.IsValid)
             {
-                return Result.Failure(validationResult.Errors.Select(e => e.ErrorMessage));
+                return Result.Failure(validationResult.Errors.Select(e => (e.PropertyName, e.ErrorMessage)));
             }
 
             await using var transaction = await _appDbContext.BeginTransactionAsync(cancellationToken);
