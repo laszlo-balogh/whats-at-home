@@ -1,4 +1,5 @@
 using Application.Common.Interfaces;
+using Application.Login;
 using Application.Registration;
 using FluentValidation;
 using Infrastructure.Identity;
@@ -35,6 +36,7 @@ builder.Services.AddScoped<IAppDbContext>(provider => provider.GetRequiredServic
 builder.Services.AddScoped<IIdentityService, IdentityService>();
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
 builder.Services.AddScoped<RegisterUserService>();
+builder.Services.AddScoped<LoginUserService>();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.User.RequireUniqueEmail = true;

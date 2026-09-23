@@ -1,4 +1,5 @@
-﻿using Application.Registration;
+﻿using Application.Login;
+using Application.Registration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +10,12 @@ namespace Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly RegisterUserService _registerUserService;
+        private readonly LoginUserService _loginUserService;
 
-        public AuthController(RegisterUserService registerUserService)
+        public AuthController(RegisterUserService registerUserService, LoginUserService loginUserService)
         {
             _registerUserService = registerUserService;
+            _loginUserService = loginUserService;
         }
 
         [HttpPost("register")]
@@ -25,11 +28,21 @@ namespace Api.Controllers
 
             foreach(var error in result.Errors)
             {
-                ModelState.AddModelError(error.Item1, error.Item2);
+                ModelState.AddModelError(error.Field, error.Message);
             }
             
-
             return ValidationProblem();
+        }
+
+        [HttpPost("login")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Login(LoginUserRequest request, CancellationToken cancellationToken)
+        {
+            var loginResult = await _loginUserService.LoginAsync(request, cancellationToken);
+
+            if (loginResult.Result.IsSuccess) return Ok();
+
+            return Unauthorized();
         }
     }
 }
