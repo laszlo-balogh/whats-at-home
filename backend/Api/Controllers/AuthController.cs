@@ -40,7 +40,7 @@ namespace Api.Controllers
         {
             var loginResult = await _loginUserService.LoginAsync(request, cancellationToken);
 
-            if (loginResult.Result.IsSuccess) return Ok();
+            if (loginResult.Result.IsSuccess) return Ok(new { token = loginResult.Token });
 
             return Unauthorized();
         }
