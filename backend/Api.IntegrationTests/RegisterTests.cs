@@ -131,14 +131,12 @@ namespace Api.IntegrationTests
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-            // A fresh scope gives a fresh DbContext, so we see what was actually committed
+            
             using var scope = _apiFactory.Services.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
             var identityUser = await dbContext.Users.SingleAsync(u => u.Email == request.Email);
-
-            // Looking the AppUser up by the Identity user's Id also verifies the Identity <-> Domain link
+            
             var appUser = await dbContext.AppUsers
                 .Include(u => u.Storage)
                 .SingleAsync(u => u.Id == identityUser.Id);
@@ -152,8 +150,7 @@ namespace Api.IntegrationTests
         [Fact]
         public async Task RegisterWithWeakPasswordDoesNotPersistAnythingTest()
         {
-            // Arrange
-            // Unique DisplayName, so we can look for a leftover AppUser even without an Identity user Id
+            // Arrange            
             var request = new
             {
                 Email = TestData.GenerateRandomEmail(),

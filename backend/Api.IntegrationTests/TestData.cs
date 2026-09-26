@@ -6,7 +6,7 @@ namespace Api.IntegrationTests
 {
     public static class TestData
     {
-        public static string TestPassword => "Password123!";
+        public const string TestPassword = "Password123!";
 
         public static string GenerateRandomEmail()
         {
