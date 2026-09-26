@@ -42,7 +42,10 @@ namespace Api.Controllers
 
             if (loginResult.Result.IsSuccess) return Ok(new { token = loginResult.Token });
 
-            return Unauthorized();
+            return Problem(
+                statusCode: StatusCodes.Status401Unauthorized, 
+                detail: string.Join(", ", loginResult.Result.Errors.Select(e => e.Message))
+                );
         }
     }
 }
